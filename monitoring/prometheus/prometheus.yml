@@ -1,0 +1,87 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'hms-cluster'
+    environment: 'development'
+
+# Alerting configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Patient Service
+  - job_name: 'patient-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['patient-service:3001']
+        labels:
+          service: 'patient'
+          tier: 'backend'
+
+  # Doctor Service
+  - job_name: 'doctor-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['doctor-service:3002']
+        labels:
+          service: 'doctor'
+          tier: 'backend'
+
+  # Appointment Service
+  - job_name: 'appointment-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['appointment-service:3003']
+        labels:
+          service: 'appointment'
+          tier: 'backend'
+
+  # Billing Service
+  - job_name: 'billing-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['billing-service:3004']
+        labels:
+          service: 'billing'
+          tier: 'backend'
+
+  # Prescription Service
+  - job_name: 'prescription-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['prescription-service:3005']
+        labels:
+          service: 'prescription'
+          tier: 'backend'
+
+  # Payment Service
+  - job_name: 'payment-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['payment-service:3006']
+        labels:
+          service: 'payment'
+          tier: 'backend'
+
+  # Notification Service
+  - job_name: 'notification-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['notification-service:3007']
+        labels:
+          service: 'notification'
+          tier: 'backend'
+
+# Recording rules for aggregations
+rule_files:
+  - 'rules/*.yml'

@@ -1,0 +1,62 @@
+groups:
+  - name: hms_service_metrics
+    interval: 30s
+    rules:
+      # Total request rate across all services
+      - record: hms:http_requests_total:rate5m
+        expr: sum(rate(http_requests_total[5m])) by (service)
+
+      # Average request duration by service
+      - record: hms:http_request_duration:p50
+        expr: histogram_quantile(0.50, sum(rate(http_request_duration_ms_bucket[5m])) by (service, le))
+
+      - record: hms:http_request_duration:p90
+        expr: histogram_quantile(0.90, sum(rate(http_request_duration_ms_bucket[5m])) by (service, le))
+
+      - record: hms:http_request_duration:p99
+        expr: histogram_quantile(0.99, sum(rate(http_request_duration_ms_bucket[5m])) by (service, le))
+
+      # Error rate by service
+      - record: hms:http_errors:rate5m
+        expr: sum(rate(http_requests_total{status_code=~"5.."}[5m])) by (service)
+
+      # Error percentage
+      - record: hms:http_error_percentage
+        expr: |
+          100 * (
+            sum(rate(http_requests_total{status_code=~"5.."}[5m])) by (service)
+            /
+            sum(rate(http_requests_total[5m])) by (service)
+          )
+
+  - name: hms_business_metrics
+    interval: 30s
+    rules:
+      # Appointment metrics
+      - record: hms:appointments_created:rate5m
+        expr: rate(appointments_created_total[5m])
+
+      # Billing metrics
+      - record: hms:bills_created:rate5m
+        expr: rate(bills_created_total[5m])
+
+      - record: hms:bill_creation_latency:p50
+        expr: histogram_quantile(0.50, rate(bill_creation_latency_ms_bucket[5m]))
+
+      - record: hms:bill_creation_latency:p99
+        expr: histogram_quantile(0.99, rate(bill_creation_latency_ms_bucket[5m]))
+
+      # Payment metrics
+      - record: hms:payments_total:rate5m
+        expr: rate(payments_total[5m])
+
+      - record: hms:payments_failed:rate5m
+        expr: rate(payments_failed_total[5m])
+
+      - record: hms:payment_failure_rate
+        expr: |
+          100 * (
+            rate(payments_failed_total[5m])
+            /
+            rate(payments_total[5m])
+          )

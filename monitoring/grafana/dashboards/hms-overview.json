@@ -1,0 +1,103 @@
+{
+  "dashboard": {
+    "title": "HMS - System Overview",
+    "tags": ["hospital", "microservices", "overview"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Request Rate by Service",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total[5m])) by (service)",
+            "legendFormat": "{{service}}"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}
+      },
+      {
+        "id": 2,
+        "title": "Error Rate by Service",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{status_code=~\"5..\"}[5m])) by (service)",
+            "legendFormat": "{{service}}"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}
+      },
+      {
+        "id": 3,
+        "title": "Response Time P50/P90/P99",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_ms_bucket[5m])) by (le))",
+            "legendFormat": "p50"
+          },
+          {
+            "expr": "histogram_quantile(0.90, sum(rate(http_request_duration_ms_bucket[5m])) by (le))",
+            "legendFormat": "p90"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_ms_bucket[5m])) by (le))",
+            "legendFormat": "p99"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8}
+      },
+      {
+        "id": 4,
+        "title": "Appointments Created",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(appointments_created_total)"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 8, "w": 6, "h": 4}
+      },
+      {
+        "id": 5,
+        "title": "Bills Generated",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(bills_created_total)"
+          }
+        ],
+        "gridPos": {"x": 18, "y": 8, "w": 6, "h": 4}
+      },
+      {
+        "id": 6,
+        "title": "Payments Processed",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(payments_total)"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 12, "w": 6, "h": 4}
+      },
+      {
+        "id": 7,
+        "title": "Payment Failures",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(payments_failed_total)"
+          }
+        ],
+        "gridPos": {"x": 18, "y": 12, "w": 6, "h": 4}
+      }
+    ],
+    "refresh": "10s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "version": 1
+  }
+}
